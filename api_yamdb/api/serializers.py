@@ -1,33 +1,35 @@
 from rest_framework import serializers
-from reviews.models import Categories, Genres, Title
-from django.contrib.auth import get_user_model
+from user.models import User
+
+from constants import USERNAME_MAX_LENGTH, EMAIL_MAX_LENGTH
+
+class UserSerializer(serializers.ModelSerializer):
+
+    class Mera:
+        model = User
+        fields = [
+            'username', 'email', 'first_name', 'last_name', 'bio', 'role'
+        ]
 
 
-User = get_user_model()  # Нужен будет для комментов :)
+class SignUpSerializer(UserSerializer):
+
+    username = serializers.CharField(
+        validators=User.user_validators,
+        max_length = USERNAME_MAX_LENGTH
+    )
+    email = serializers.EmailField(
+        max_length=EMAIL_MAX_LENGTH,
+    )
 
 
-class CategoriesSerializer(serializers.ModelSerializer):
-    """Сериализатор для категорий."""
+class TokenSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(
+        validators=User.user_validators,
+        max_length=USERNAME_MAX_LENGTH
+    )
+    confirmation_code = serializers.CharField(required=True)
 
     class Meta:
-        model = Categories
-        fields = ('name', 'slug')
-
-
-class GenresSerializer(serializers.ModelSerializer):
-    """Сериализатор для жанров."""
-
-    class Meta:
-        model = Genres
-        fields = ('name', 'slug')
-
-
-class TitleSerializer(serializers.ModelSerializer):
-    """Сериализатор для произведений."""
-
-    category = CategoriesSerializer(many=False, read_only=True)
-    genre = GenresSerializer(many=True, read_only=True)
-
-    class Meta:
-        model = Title
-        fields = '__all__'
+        model = User
+        fields = ['username', 'confirmation_code']
