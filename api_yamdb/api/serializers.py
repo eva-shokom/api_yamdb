@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from reviews.models import Categories, Genres, Title
+from reviews.models import Categories, Genres, Title, Review
 from django.contrib.auth import get_user_model
 
 
@@ -31,3 +31,14 @@ class TitleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Title
         fields = '__all__'
+
+
+class ReviewSerializer(serializers.ModelSerializer):
+    """Сериализатор для отзывов."""
+    author = serializers.SlugRelatedField(
+        read_only=True, slug_field='username'
+    )
+
+    class Meta:
+        model = Review
+        fields = ('id', 'text', 'author', 'score', 'pub_date',)
