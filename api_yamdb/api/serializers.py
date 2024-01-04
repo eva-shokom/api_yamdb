@@ -1,9 +1,8 @@
 from rest_framework import serializers
-from user.models import User
-from reviews.models import Categories, Genres, Title, Review, Comment
-from django.contrib.auth import get_user_model
+from reviews.models import Categories, Genres, Title, Review, Comment, User
 
 from constants import USERNAME_MAX_LENGTH, EMAIL_MAX_LENGTH
+
 
 class UserSerializer(serializers.ModelSerializer):
 
@@ -18,7 +17,7 @@ class SignUpSerializer(UserSerializer):
 
     username = serializers.CharField(
         validators=User.user_validators,
-        max_length = USERNAME_MAX_LENGTH
+        max_length=USERNAME_MAX_LENGTH
     )
     email = serializers.EmailField(
         max_length=EMAIL_MAX_LENGTH,
