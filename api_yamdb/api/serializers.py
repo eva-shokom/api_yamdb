@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from reviews.models import Categories, Genres, Title, Review
+from reviews.models import Categories, Genres, Title, Review, Comment
 from django.contrib.auth import get_user_model
 
 
@@ -42,3 +42,14 @@ class ReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Review
         fields = ('id', 'text', 'author', 'score', 'pub_date',)
+
+
+class CommentSerializer(serializers.ModelSerializer):
+    """Сериализатор для комментариев."""
+    author = serializers.SlugRelatedField(
+        read_only=True, slug_field='username'
+    )
+
+    class Meta:
+        model = Comment
+        fields = ('id', 'text', 'author', 'pub_date',)
