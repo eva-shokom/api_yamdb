@@ -1,4 +1,8 @@
+from django.contrib.auth import get_user_model
 from django.db import models
+
+
+User = get_user_model()
 
 
 class Categories(models.Model):
@@ -100,3 +104,16 @@ class TitleGenres(models.Model):
 
     def __str__(self):
         return f'{self.title}-{self.genre}'
+
+
+class Review(models.Model):
+    """отзывы."""
+
+    text = models.TextField()
+    author = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name='reviews')
+    score = models.PositiveSmallIntegerField()
+    pub_date = models.DateTimeField(
+        'Дата добавления', auto_now_add=True)
+    title = models.ForeignKey(
+        Title, on_delete=models.CASCADE, related_name='reviews')
