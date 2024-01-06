@@ -1,14 +1,11 @@
-from django.contrib.auth import get_user_model
 from rest_framework import serializers
-from rest_framework.exceptions import ValidationError
 
 from reviews.models import Categories, Genres, Title, Review, Comment
 from users.models import User
 
 
-
 class UserSerializer(serializers.ModelSerializer):
-    """Сериализатор для модели User"""
+    """Сериализатор для модели User."""
 
     class Meta:
         model = User
@@ -23,7 +20,6 @@ class SignUpSerializer(UserSerializer):
     email = serializers.EmailField(max_length=150)
 
 
-
 class TokenSerializer(serializers.ModelSerializer):
     """Сериализатор для аутентификации по токену."""
     username = serializers.CharField(max_length=150, required=True)
@@ -33,7 +29,7 @@ class TokenSerializer(serializers.ModelSerializer):
         model = User
         fields = ['username', 'confirmation_code']
 
-        
+
 class CategoriesSerializer(serializers.ModelSerializer):
     """Сериализатор для категорий."""
 
