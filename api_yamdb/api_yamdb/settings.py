@@ -139,3 +139,5 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 STATICFILES_DIRS = ((BASE_DIR / 'static/'),)
+
+ADMIN_EMAIL = 'admin@practicum.yandex.ru'
