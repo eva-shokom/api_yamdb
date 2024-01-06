@@ -1,10 +1,10 @@
+from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
-from reviews.models import Categories, Genres, Title, Review, Comment
-from django.contrib.auth import get_user_model
 
-from reviews.models import Categories, Comment, Genres, Review, Title
+from reviews.models import Categories, Genres, Title, Review, Comment
 from users.models import User
+
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -18,13 +18,14 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class SignUpSerializer(UserSerializer):
-    """Сериализатор для регистрации"""
+    """Сериализатор для регистрации."""
     username = serializers.CharField(max_length=150, required=True)
     email = serializers.EmailField(max_length=150)
 
 
+
 class TokenSerializer(serializers.ModelSerializer):
-    """Сериализатор для аутентификации по токену"""
+    """Сериализатор для аутентификации по токену."""
     username = serializers.CharField(max_length=150, required=True)
     confirmation_code = serializers.CharField(required=True)
 
