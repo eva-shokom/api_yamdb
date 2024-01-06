@@ -18,7 +18,7 @@ v1_router.register(
     r'titles/(?P<title_id>\d+)/reviews', ReviewViewSet, basename='review')
 v1_router.register(
     r'titles/(?P<title_id>\d+)/reviews/(?P<review_id>\d+)/comments',
-    CommentViewSet, basename='comment',
+    CommentViewSet, basename='comment'
 )
 v1_router.register(r'users', UsersViewSet, basename='users')
 
@@ -34,7 +34,6 @@ auth_urls = [
         name='token'
     )
 ]
-
 
 urlpatterns = [
     path('v1/auth/', include(auth_urls)),
