@@ -1,12 +1,16 @@
+from django.contrib.auth import get_user_model
 from rest_framework import serializers
-from reviews.models import Categories, Genres, Title, Review, Comment, User
+from rest_framework.exceptions import ValidationError
 
-from constants import USERNAME_MAX_LENGTH, EMAIL_MAX_LENGTH
+from reviews.models import Categories, Genres, Title, Review, Comment
+from users.models import User
+
 
 
 class UserSerializer(serializers.ModelSerializer):
+    """Сериализатор для модели User"""
 
-    class Mera:
+    class Meta:
         model = User
         fields = [
             'username', 'email', 'first_name', 'last_name', 'bio', 'role'
@@ -14,21 +18,15 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class SignUpSerializer(UserSerializer):
+    """Сериализатор для регистрации."""
+    username = serializers.CharField(max_length=150, required=True)
+    email = serializers.EmailField(max_length=150)
 
-    username = serializers.CharField(
-        validators=User.user_validators,
-        max_length=USERNAME_MAX_LENGTH
-    )
-    email = serializers.EmailField(
-        max_length=EMAIL_MAX_LENGTH,
-    )
 
 
 class TokenSerializer(serializers.ModelSerializer):
-    username = serializers.CharField(
-        validators=User.user_validators,
-        max_length=USERNAME_MAX_LENGTH
-    )
+    """Сериализатор для аутентификации по токену."""
+    username = serializers.CharField(max_length=150, required=True)
     confirmation_code = serializers.CharField(required=True)
 
     class Meta:

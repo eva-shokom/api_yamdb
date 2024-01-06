@@ -1,15 +1,10 @@
-from django.shortcuts import get_object_or_404
-from rest_framework import viewsets, mixins, permissions
+from rest_framework import viewsets, mixins
 
 from reviews.models import Categories, Genres, Title, Review
 from .serializers import (
-    CategoriesSerializer,
-    GenresSerializer,
-    TitleSerializer,
-    ReviewSerializer,
-    CommentSerializer
+    CategoriesSerializer, GenresSerializer, TitleSerializer,
+    ReviewSerializer, CommentSerializer,
 )
-from .permissions import IsAuthorOrAdminOrModeratorOrReadOnly
 
 
 class CategoryViewSet(mixins.ListModelMixin,
@@ -32,7 +27,7 @@ class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.all()
     serializer_class = TitleSerializer
 
-
+    
 class ReviewViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewSerializer
     permission_classes = (
