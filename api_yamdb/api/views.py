@@ -6,6 +6,10 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import AccessToken
+from rest_framework.pagination import PageNumberPagination
+from django.db.models import Avg
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.filters import SearchFilter
 
 from reviews.models import Categories, Genres, Title, Review
 from users.models import User
@@ -15,11 +19,16 @@ from .serializers import (
     TokenSerializer, UserSerializer,
 )
 from .permissions import (
-    IsAuthorOrAdminOrModeratorOrReadOnly, IsOwnerOrAdmin, IsAdmin)
+    IsAuthorOrAdminOrModeratorOrReadOnly,
+    IsOwnerOrAdmin,
+    IsAdmin,
+    IsAdminOrReadOnly,
+)
 from .utils import (
     check_confirmation_code, generate_confirmation_code,
     send_confirmation_email
 )
+from .filters import TitleFilter
 
 
 class SignUpViewSet(APIView):
@@ -118,6 +127,11 @@ class CategoryViewSet(mixins.ListModelMixin,
                       viewsets.GenericViewSet):
     queryset = Categories.objects.all()
     serializer_class = CategoriesSerializer
+    permission_classes = [IsAdminOrReadOnly]
+    pagination_class = PageNumberPagination
+    filter_backends = [DjangoFilterBackend, SearchFilter]
+    search_fields = ['name']
+    lookup_field = 'slug'
 
 
 class GenreViewSet(mixins.ListModelMixin,
@@ -126,11 +140,22 @@ class GenreViewSet(mixins.ListModelMixin,
                    viewsets.GenericViewSet):
     queryset = Genres.objects.all()
     serializer_class = GenresSerializer
+    permission_classes = [IsAdminOrReadOnly]
+    pagination_class = PageNumberPagination
+    filter_backends = [DjangoFilterBackend, SearchFilter]
+    search_fields = ['name']
+    lookup_field = 'slug'
 
 
 class TitleViewSet(viewsets.ModelViewSet):
-    queryset = Title.objects.all()
+    queryset = Title.objects.annotate(
+        rating=Avg('reviews__score')).order_by('id')
     serializer_class = TitleSerializer
+    http_method_names = ['get', 'post', 'patch', 'delete']
+    permission_classes = [IsAdminOrReadOnly]
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = TitleFilter
+    pagination_class = PageNumberPagination
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
