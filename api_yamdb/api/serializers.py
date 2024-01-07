@@ -16,8 +16,11 @@ class UserSerializer(serializers.ModelSerializer):
 
 class SignUpSerializer(UserSerializer):
     """Сериализатор для регистрации."""
-    username = serializers.CharField(max_length=150, required=True)
-    email = serializers.EmailField(max_length=150)
+    username = serializers.CharField(max_length=150,
+                                     validators=User.user_validators,
+                                     required=True)
+    email = serializers.EmailField(max_length=150,
+                                   required=True)
 
 
 class TokenSerializer(serializers.ModelSerializer):
