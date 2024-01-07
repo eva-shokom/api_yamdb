@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from rest_framework.validators import ValidationError
 
 from reviews.models import Categories, Genres, Title, Review, Comment
 from users.models import User
@@ -69,6 +70,15 @@ class ReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Review
         fields = ('id', 'text', 'author', 'score', 'pub_date',)
+
+    def validate(self, data):
+        title_id = self.context['view'].kwargs['title_id']
+        author = self.context['request'].user
+        if self.context['request'].method == 'POST' and Review.objects.filter(
+            author=author, title_id=title_id
+        ).exists():
+            raise ValidationError('Вы уже оставили отзыв на это произведение')
+        return data
 
 
 class CommentSerializer(serializers.ModelSerializer):
