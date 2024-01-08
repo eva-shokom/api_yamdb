@@ -37,6 +37,8 @@ class TokenSerializer(serializers.ModelSerializer):
 class CategoriesSerializer(serializers.ModelSerializer):
     """Сериализатор для категорий."""
 
+    lookup_field = 'slug'
+
     class Meta:
         model = Categories
         fields = ('name', 'slug')
@@ -44,6 +46,8 @@ class CategoriesSerializer(serializers.ModelSerializer):
 
 class GenresSerializer(serializers.ModelSerializer):
     """Сериализатор для жанров."""
+
+    lookup_field = 'slug'
 
     class Meta:
         model = Genres
@@ -53,12 +57,32 @@ class GenresSerializer(serializers.ModelSerializer):
 class TitleSerializer(serializers.ModelSerializer):
     """Сериализатор для произведений."""
 
-    category = CategoriesSerializer(many=False, read_only=True)
-    genre = GenresSerializer(many=True, read_only=True)
+    # category = CategoriesSerializer(many=False, read_only=True)
+    # genre = GenresSerializer(many=True, read_only=True)
+    category = serializers.SlugRelatedField(
+        slug_field='slug',
+        queryset=Categories.objects.all()
+    )
+    genre = serializers.SlugRelatedField(
+        slug_field='slug',
+        queryset=Genres.objects.all(),
+        many=True
+    )
+    rating = serializers.FloatField(read_only=True)
 
     class Meta:
         model = Title
         fields = '__all__'
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation['category'] = (
+            CategoriesSerializer(instance.category).data
+        )
+        representation['genre'] = GenresSerializer(
+            instance.genre.all(), many=True
+        ).data
+        return representation
 
 
 class ReviewSerializer(serializers.ModelSerializer):

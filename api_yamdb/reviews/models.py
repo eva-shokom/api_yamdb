@@ -81,6 +81,10 @@ class Title(models.Model):
         verbose_name = 'Произведение'
         verbose_name_plural = 'Произведения'
         ordering = ('name',)
+        constraints = [
+            models.UniqueConstraint(fields=['name', 'year', 'category'],
+                                    name='unique_media')
+        ]
 
     def __str__(self):
         return self.name
