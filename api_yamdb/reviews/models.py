@@ -1,8 +1,10 @@
+from datetime import datetime
+
 from django.contrib.auth import get_user_model
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
+
 from django.db.models import Q, F
-# from datetime import datetime
 
 
 User = get_user_model()
@@ -59,16 +61,16 @@ class Title(models.Model):
     )
     year = models.SmallIntegerField(
         verbose_name='Год',
-        # validators=[
-        #     MaxValueValidator(
-        #         0,
-        #         message='Год не может быть отрицательным!',
-        #     ),
-        #     MaxValueValidator(
-        #         datetime.now().year,
-        #         message='Год не может быть больше текущего!',
-        #     )
-        # ],
+        validators=[
+            MaxValueValidator(
+                0,
+                message='Год не может быть отрицательным!',
+            ),
+            MaxValueValidator(
+                datetime.now().year,
+                message='Год не может быть больше текущего!',
+            )
+        ],
     )
     description = models.TextField(
         blank=True,
@@ -113,6 +115,7 @@ class TitleGenres(models.Model):
     class Meta:
         verbose_name = 'Произведение-Жанр'
         verbose_name_plural = 'Произведения-Жанры'
+        ordering = ('genre',)
 
     def __str__(self):
         return f'{self.title}-{self.genre}'
