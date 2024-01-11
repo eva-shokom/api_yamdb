@@ -1,8 +1,11 @@
 from rest_framework import serializers
 from rest_framework.validators import ValidationError
+from django.core.validators import MinValueValidator, MaxValueValidator
 
 from reviews.models import Categories, Genres, Title, Review, Comment
 from users.models import User
+
+from datetime import datetime
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -54,35 +57,44 @@ class GenresSerializer(serializers.ModelSerializer):
         fields = ('name', 'slug')
 
 
-class TitleSerializer(serializers.ModelSerializer):
-    """Сериализатор для произведений."""
-
-    # category = CategoriesSerializer(many=False, read_only=True)
-    # genre = GenresSerializer(many=True, read_only=True)
-    category = serializers.SlugRelatedField(
-        slug_field='slug',
-        queryset=Categories.objects.all()
-    )
-    genre = serializers.SlugRelatedField(
-        slug_field='slug',
-        queryset=Genres.objects.all(),
-        many=True
-    )
-    rating = serializers.FloatField(read_only=True)
+class TitleReadSerializer(serializers.ModelSerializer):
+    rating = serializers.IntegerField(read_only=True, default=0)
+    category = CategoriesSerializer(many=False, read_only=True)
+    genre = GenresSerializer(many=True, read_only=True)
 
     class Meta:
         model = Title
-        fields = '__all__'
-
-    def to_representation(self, instance):
-        representation = super().to_representation(instance)
-        representation['category'] = (
-            CategoriesSerializer(instance.category).data
+        fields = (
+            "id",
+            "name",
+            "year",
+            "rating",
+            "description",
+            "genre",
+            "category",
         )
-        representation['genre'] = GenresSerializer(
-            instance.genre.all(), many=True
-        ).data
-        return representation
+
+
+class TitleWriteSerializer(serializers.ModelSerializer):
+    year = serializers.IntegerField(
+        validators=[
+            MinValueValidator(0),
+            MaxValueValidator(datetime.now().year)
+        ],
+    )
+    genre = serializers.SlugRelatedField(
+        slug_field="slug", many=True, queryset=Genres.objects.all()
+    )
+    category = serializers.SlugRelatedField(
+        slug_field="slug", queryset=Categories.objects.all()
+    )
+
+    class Meta:
+        fields = ("id", "name", "year", "description", "genre", "category")
+        model = Title
+
+    def to_representation(self, value):
+        return TitleReadSerializer(value).data
 
 
 class ReviewSerializer(serializers.ModelSerializer):
