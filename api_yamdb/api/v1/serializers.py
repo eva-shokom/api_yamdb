@@ -1,6 +1,5 @@
 from rest_framework import serializers
 from rest_framework.validators import ValidationError
-from django.core.validators import MinValueValidator, MaxValueValidator
 
 from reviews.models import Categories, Genres, Title, Review, Comment
 from users.models import User
@@ -19,17 +18,18 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class SignUpSerializer(UserSerializer):
-    """Сериализатор для регистрации."""
-    username = serializers.CharField(max_length=150,
-                                     validators=User.user_validators,
-                                     required=True)
-    email = serializers.EmailField(max_length=150,
-                                   required=True)
+    """Сериализатор для регистрации"""
+
+    username = serializers.CharField(max_length=settings.USERNAME_MAX_LENGTH,
+                                     validators=User.user_validators)
+    email = serializers.EmailField(max_length=settings.EMAIL_MAX_LENGTH)
 
 
 class TokenSerializer(serializers.ModelSerializer):
-    """Сериализатор для аутентификации по токену."""
-    username = serializers.CharField(max_length=150, required=True)
+    """Сериализатор для аутентификации по токену"""
+
+    username = serializers.CharField(max_length=settings.USERNAME_MAX_LENGTH,
+                                     validators=User.user_validators)
     confirmation_code = serializers.CharField(required=True)
 
     class Meta:
@@ -108,12 +108,13 @@ class ReviewSerializer(serializers.ModelSerializer):
         fields = ('id', 'text', 'author', 'score', 'pub_date',)
 
     def validate(self, data):
-        title_id = self.context['view'].kwargs['title_id']
-        author = self.context['request'].user
-        if self.context['request'].method == 'POST' and Review.objects.filter(
-            author=author, title_id=title_id
-        ).exists():
-            raise ValidationError('Вы уже оставили отзыв на это произведение')
+        if self.context['request'].method == 'POST':
+            title_id = self.context['view'].kwargs['title_id']
+            author = self.context['request'].user
+            if Review.objects.filter(
+                    author=author, title_id=title_id).exists():
+                raise ValidationError(
+                    'Вы уже оставили отзыв на это произведение')
         return data
 
 

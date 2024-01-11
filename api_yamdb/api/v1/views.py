@@ -22,10 +22,7 @@ from .permissions import (
     IsAdmin,
     IsAdminOrReadOnly,
 )
-from .utils import (
-    check_confirmation_code, generate_confirmation_code,
-    send_confirmation_email
-)
+from .utils import (send_confirmation_email)
 from .filters import TitleFilter
 from .viewsets import BaseViewSet
 
@@ -51,7 +48,7 @@ class SignUpViewSet(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
         else:
-            confirmation_code = generate_confirmation_code(user)
+            confirmation_code = default_token_generator.make_token(user)
             send_confirmation_email(user, confirmation_code)
             return Response(
                 serializer.validated_data,
@@ -71,12 +68,6 @@ class TokenViewSet(APIView):
             User,
             username=serializer.validated_data['username']
         )
-        if check_confirmation_code(user, confirmation_code):
-            token = AccessToken.for_user(user)
-            return Response(
-                {'token': str(token)},
-                status=status.HTTP_200_OK
-            )
         return Response(
             'Неверный код подтверждения',
             status=status.HTTP_400_BAD_REQUEST
@@ -176,7 +167,10 @@ class CommentViewSet(viewsets.ModelViewSet):
 
     def get_review(self):
         return get_object_or_404(
-            Review, id=self.kwargs.get('review_id'))
+            Review,
+            id=self.kwargs.get('review_id'),
+            title__id=self.kwargs.get('title_id')
+        )
 
     def get_queryset(self):
         review = self.get_review()
