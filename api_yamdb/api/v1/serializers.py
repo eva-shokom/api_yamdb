@@ -1,5 +1,8 @@
 from rest_framework import serializers
 from rest_framework.validators import ValidationError
+from django.conf import settings
+from django.core.validators import MinValueValidator, MaxValueValidator
+
 
 from reviews.models import Categories, Genres, Title, Review, Comment
 from users.models import User
