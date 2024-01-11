@@ -3,8 +3,13 @@ from datetime import datetime
 from django.contrib.auth import get_user_model
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
-
+<<<<<<<<< Temporary merge branch 1
 from django.db.models import Q, F
+# from datetime import datetime
+=========
+
+from datetime import datetime
+>>>>>>>>> Temporary merge branch 2
 
 
 User = get_user_model()
@@ -56,7 +61,7 @@ class Title(models.Model):
     """Произведения."""
 
     name = models.CharField(
-        max_length=256,
+        max_length=settings.MAX_LENGTH,
         verbose_name='Название'
     )
     year = models.SmallIntegerField(
@@ -179,7 +184,7 @@ class Comment(models.Model):
         on_delete=models.CASCADE,
         related_name='comments',
         verbose_name='Отзыв')
-    
+
     class Meta:
         verbose_name = 'Комментарий'
         verbose_name_plural = 'Комментарии'
