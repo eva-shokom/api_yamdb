@@ -1,7 +1,7 @@
 from django.db import IntegrityError
 from django.shortcuts import get_object_or_404
 from rest_framework import (
-    viewsets, permissions, status, pagination, filters)
+    viewsets, mixins, permissions, status, pagination, filters)
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -9,13 +9,14 @@ from rest_framework_simplejwt.tokens import AccessToken
 from rest_framework.pagination import PageNumberPagination
 from django.db.models import Avg
 from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.filters import SearchFilter
 
 from reviews.models import Categories, Genres, Title, Review
 from users.models import User
 from .serializers import (
-    CategoriesSerializer, GenresSerializer, TitleReadSerializer,
+    CategoriesSerializer, GenresSerializer, TitleSerializer,
     ReviewSerializer, CommentSerializer, SignUpSerializer,
-    TokenSerializer, UserSerializer, TitleWriteSerializer,
+    TokenSerializer, UserSerializer,
 )
 from .permissions import (
     IsAuthorOrAdminOrModeratorOrReadOnly,
@@ -28,7 +29,6 @@ from .utils import (
     send_confirmation_email
 )
 from .filters import TitleFilter
-from .viewsets import BaseViewSet
 
 
 class SignUpViewSet(APIView):
@@ -121,16 +121,28 @@ class UsersViewSet(viewsets.ModelViewSet):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-class CategoryViewSet(BaseViewSet):
+class CategoryViewSet(mixins.ListModelMixin,
+                      mixins.CreateModelMixin,
+                      mixins.DestroyModelMixin,
+                      viewsets.GenericViewSet):
     queryset = Categories.objects.all()
     serializer_class = CategoriesSerializer
+    permission_classes = [IsAdminOrReadOnly]
+    pagination_class = PageNumberPagination
+    filter_backends = [DjangoFilterBackend, SearchFilter]
     search_fields = ['name']
     lookup_field = 'slug'
 
 
-class GenreViewSet(BaseViewSet):
+class GenreViewSet(mixins.ListModelMixin,
+                   mixins.CreateModelMixin,
+                   mixins.DestroyModelMixin,
+                   viewsets.GenericViewSet):
     queryset = Genres.objects.all()
     serializer_class = GenresSerializer
+    permission_classes = [IsAdminOrReadOnly]
+    pagination_class = PageNumberPagination
+    filter_backends = [DjangoFilterBackend, SearchFilter]
     search_fields = ['name']
     lookup_field = 'slug'
 
@@ -138,16 +150,12 @@ class GenreViewSet(BaseViewSet):
 class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.annotate(
         rating=Avg('reviews__score')).order_by('id')
+    serializer_class = TitleSerializer
     http_method_names = ['get', 'post', 'patch', 'delete']
     permission_classes = [IsAdminOrReadOnly]
     filter_backends = [DjangoFilterBackend]
     filterset_class = TitleFilter
     pagination_class = PageNumberPagination
-
-    def get_serializer_class(self):
-        if self.action in ("list", "retrieve"):
-            return TitleReadSerializer
-        return TitleWriteSerializer
 
 
 class ReviewViewSet(viewsets.ModelViewSet):

@@ -1,6 +1,6 @@
 from django.contrib.auth import get_user_model
-from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
+from django.db import models
 
 # from datetime import datetime
 
@@ -119,7 +119,7 @@ class TitleGenres(models.Model):
 
 
 class Review(models.Model):
-    """отзывы."""
+    """Отзывы."""
 
     text = models.TextField()
     author = models.ForeignKey(
