@@ -1,6 +1,7 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.contrib.auth.validators import UnicodeUsernameValidator
+from django.conf import settings
 
 from .validators import username_not_me
 
@@ -23,7 +24,7 @@ class User(AbstractUser):
     ]
 
     username = models.CharField(
-        max_length=150,
+        max_length=settings.USERNAME_MAX_LENGTH,
         verbose_name='Логин',
         help_text='Укажите логин',
         unique=True,
@@ -31,28 +32,28 @@ class User(AbstractUser):
     )
 
     email = models.EmailField(
-        max_length=150,
+        max_length=settings.EMAIL_MAX_LENGTH,
         verbose_name='E-mail',
         help_text='Укажите e-mail',
         unique=True,
     )
 
     first_name = models.CharField(
-        max_length=150,
+        max_length=settings.USERNAME_MAX_LENGTH,
         verbose_name='Имя',
         help_text='Укажите ваше имя',
         blank=True,
     )
 
     last_name = models.CharField(
-        max_length=150,
+        max_length=settings.USERNAME_MAX_LENGTH,
         verbose_name='Фамилия',
         help_text='Укажите вашу фамилию',
         blank=True,
     )
 
     bio = models.TextField(
-        max_length=150,
+        max_length=settings.BIO_MAX_LENGTH,
         verbose_name='О себе',
         help_text='Расскажите о себе',
         blank=True,
