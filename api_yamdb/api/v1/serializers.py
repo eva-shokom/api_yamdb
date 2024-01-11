@@ -1,8 +1,10 @@
 from rest_framework import serializers
 from rest_framework.validators import ValidationError
+<<<<<<<<< Temporary merge branch 1
 from django.conf import settings
+=========
 from django.core.validators import MinValueValidator, MaxValueValidator
-
+>>>>>>>>> Temporary merge branch 2
 
 from reviews.models import Categories, Genres, Title, Review, Comment
 from users.models import User
@@ -61,7 +63,7 @@ class GenresSerializer(serializers.ModelSerializer):
 
 
 class TitleReadSerializer(serializers.ModelSerializer):
-    rating = serializers.IntegerField(read_only=True)
+    rating = serializers.IntegerField(read_only=True, default=None)
     genre = GenresSerializer(many=True, read_only=True)
     category = CategoriesSerializer(read_only=True)
 
