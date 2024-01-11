@@ -8,11 +8,8 @@ from rest_framework.views import APIView
 from rest_framework.pagination import PageNumberPagination
 from django.db.models import Avg
 from django_filters.rest_framework import DjangoFilterBackend
-<<<<<<<<< Temporary merge branch 1
 from rest_framework.filters import SearchFilter
 from django.contrib.auth.tokens import default_token_generator
-=========
->>>>>>>>> Temporary merge branch 2
 
 from reviews.models import Categories, Genres, Title, Review
 from users.models import User
