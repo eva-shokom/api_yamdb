@@ -9,6 +9,7 @@ from rest_framework_simplejwt.tokens import AccessToken
 from rest_framework.pagination import PageNumberPagination
 from django.db.models import Avg
 from django_filters.rest_framework import DjangoFilterBackend
+from django.contrib.auth.tokens import default_token_generator
 
 from reviews.models import Categories, Genres, Title, Review
 from users.models import User
