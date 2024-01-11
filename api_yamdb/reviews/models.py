@@ -2,6 +2,8 @@ from django.contrib.auth import get_user_model
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 
+# from datetime import datetime
+
 
 User = get_user_model()
 
@@ -55,12 +57,21 @@ class Title(models.Model):
         max_length=256,
         verbose_name='Название'
     )
-    year = models.PositiveIntegerField(
-        verbose_name='Год'
+    year = models.SmallIntegerField(
+        verbose_name='Год',
+        # validators=[
+        #     MaxValueValidator(
+        #         0,
+        #         message='Год не может быть отрицательным!',
+        #     ),
+        #     MaxValueValidator(
+        #         datetime.now().year,
+        #         message='Год не может быть больше текущего!',
+        #     )
+        # ],
     )
     description = models.TextField(
         blank=True,
-        null=True,
         verbose_name='Описание'
     )
     category = models.ForeignKey(
@@ -81,10 +92,6 @@ class Title(models.Model):
         verbose_name = 'Произведение'
         verbose_name_plural = 'Произведения'
         ordering = ('name',)
-        constraints = [
-            models.UniqueConstraint(fields=['name', 'year', 'category'],
-                                    name='unique_media')
-        ]
 
     def __str__(self):
         return self.name
@@ -129,6 +136,9 @@ class Review(models.Model):
     class Meta:
         unique_together = ['author', 'title']
 
+    def __str__(self):
+        return self.text
+
 
 class Comment(models.Model):
     """Комментарии."""
@@ -140,3 +150,6 @@ class Comment(models.Model):
         'Дата добавления', auto_now_add=True)
     review = models.ForeignKey(
         Review, on_delete=models.CASCADE, related_name='comments')
+
+    def __str__(self):
+        return self.text

@@ -7,7 +7,6 @@ class TitleFilter(django_filters.FilterSet):
     """Фильтр  Title."""
 
     name = django_filters.CharFilter(lookup_expr='icontains')
-    year = django_filters.NumberFilter()
     category = django_filters.ModelChoiceFilter(
         field_name='category',
         queryset=Categories.objects.all(),
