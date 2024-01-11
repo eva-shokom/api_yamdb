@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from rest_framework.validators import ValidationError
+from django.conf import settings
 
 from reviews.models import Categories, Genres, Title, Review, Comment
 from users.models import User
@@ -16,17 +17,18 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class SignUpSerializer(UserSerializer):
-    """Сериализатор для регистрации."""
-    username = serializers.CharField(max_length=150,
-                                     validators=User.user_validators,
-                                     required=True)
-    email = serializers.EmailField(max_length=150,
-                                   required=True)
+    """Сериализатор для регистрации"""
+
+    username = serializers.CharField(max_length=settings.USERNAME_MAX_LENGTH,
+                                     validators=User.user_validators)
+    email = serializers.EmailField(max_length=settings.EMAIL_MAX_LENGTH)
 
 
 class TokenSerializer(serializers.ModelSerializer):
-    """Сериализатор для аутентификации по токену."""
-    username = serializers.CharField(max_length=150, required=True)
+    """Сериализатор для аутентификации по токену"""
+
+    username = serializers.CharField(max_length=settings.USERNAME_MAX_LENGTH,
+                                     validators=User.user_validators)
     confirmation_code = serializers.CharField(required=True)
 
     class Meta:

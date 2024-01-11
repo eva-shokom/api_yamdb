@@ -140,4 +140,18 @@ STATIC_URL = '/static/'
 
 STATICFILES_DIRS = ((BASE_DIR / 'static/'),)
 
+EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
+EMAIL_FILE_PATH = BASE_DIR / 'sent_emails'
 ADMIN_EMAIL = 'admin@practicum.yandex.ru'
+
+
+# Constants
+SLUG_MAX_LENGTH = 50
+
+OUTPUT_RESTRICTION = 50
+
+USERNAME_MAX_LENGTH = 150
+
+EMAIL_MAX_LENGTH = 254
+
+BIO_MAX_LENGTH = 450
