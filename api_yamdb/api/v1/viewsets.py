@@ -14,3 +14,5 @@ class BaseViewSet(
     permission_classes = [IsAdminOrReadOnly]
     pagination_class = PageNumberPagination
     filter_backends = [DjangoFilterBackend, SearchFilter]
+    search_fields = ['name']
+    lookup_field = 'slug'

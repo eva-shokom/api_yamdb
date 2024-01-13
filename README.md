@@ -45,6 +45,7 @@
 1. Склонировать репозиторий.
 2. Находясь в папке с кодом, создать виртуальное окружение с помощью команды `python -m venv venv` и активировать его (Windows: `source venv\scripts\activate`; Linux/Mac: `source venv/bin/activate`).
 3. Установить необходимые зависимости с помощью команды `python -m pip install -r requirements.txt`.
+4. Заполнить базу данных из файлов csv: `python manage.py from_csv_to_db`
 
 Для запуска сервера разработки необходимо выполнить следующие команды в директории проекта:
 
@@ -53,6 +54,8 @@ python manage.py migrate
 python manage.py createsuperuser
 python manage.py runserver
 ```
+
+#### Документация к API доступна по адресу [http://127.0.0.1:8000/redoc/](http://127.0.0.1:8000/redoc/) после запуска сервера с проектом
 
 После выполнения этих шагов проект будет запущен и станет доступен по адресу [localhost:8000](http://localhost:8000/).
 
