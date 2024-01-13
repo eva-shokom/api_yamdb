@@ -29,20 +29,20 @@ from .viewsets import BaseViewSet
 
 
 class SignUpViewSet(APIView):
-    """Регистрация нового пользователя."""
+    """Регистрация нового пользователя"""
 
     permission_classes = [permissions.AllowAny]
 
     def post(self, request):
-        """
-        Отправляет код подтверждения на email.
-        """
+        """Отправляет код подтверждения на email"""
         serializer = SignUpSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
+        email = serializer.validated_data.get('email')
+        username = serializer.validated_data.get('username')
         try:
-            user, _ = User.objects.get_or_create(
-                **serializer.validated_data
-            )
+            user, is_created = User.objects.get_or_create(
+                email=email,
+                username=username)
         except IntegrityError:
             return Response(
                 'Такой логин или email уже существуют',
