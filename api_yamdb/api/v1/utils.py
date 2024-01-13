@@ -8,5 +8,6 @@ def send_confirmation_email(user, confirmation_code):
     from_email = settings.ADMIN_EMAIL
     user.email_user(subject, message, from_email)
 
+
 def check_confirmation_code(user, confirmation_code):
     return default_token_generator.check_token(user, confirmation_code)
