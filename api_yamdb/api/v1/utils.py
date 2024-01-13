@@ -9,12 +9,5 @@ def send_confirmation_email(user, confirmation_code):
     user.email_user(subject, message, from_email)
 
 
-def generate_confirmation_code(user):
-    confirmation_code = default_token_generator.make_token(user)
-    user.confirmation_code = confirmation_code
-    user.save()
-    return confirmation_code
-
-
 def check_confirmation_code(user, confirmation_code):
     return default_token_generator.check_token(user, confirmation_code)

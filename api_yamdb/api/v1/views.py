@@ -1,54 +1,55 @@
 from django.db import IntegrityError
-from django.db.models import Avg
 from django.shortcuts import get_object_or_404
-from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import (
-    viewsets, mixins, permissions, status, pagination, filters)
+    viewsets, permissions, status, pagination, filters)
 from rest_framework.decorators import action
-from rest_framework.filters import SearchFilter
-from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.pagination import PageNumberPagination
 from rest_framework_simplejwt.tokens import AccessToken
+from django.db.models import Avg
+from django_filters.rest_framework import DjangoFilterBackend
+from django.contrib.auth.tokens import default_token_generator
 
-from .filters import TitleFilter
+from reviews.models import Categories, Genres, Title, Review
+from users.models import User
+from .serializers import (
+    CategoriesSerializer, GenresSerializer, TitleReadSerializer,
+    ReviewSerializer, CommentSerializer, SignUpSerializer,
+    TokenSerializer, UserSerializer, TitleWriteSerializer
+)
 from .permissions import (
     IsAuthorOrAdminOrModeratorOrReadOnly,
-    IsOwnerOrAdmin,
     IsAdmin,
     IsAdminOrReadOnly,
 )
-from .serializers import (
-    CategoriesSerializer, GenresSerializer, TitleSerializer,
-    ReviewSerializer, CommentSerializer, SignUpSerializer,
-    TokenSerializer, UserSerializer,
-)
-from .utils import (
-    check_confirmation_code, generate_confirmation_code,
-    send_confirmation_email
-)
-from reviews.models import Categories, Genres, Title, Review
-from users.models import User
+from .utils import (send_confirmation_email, check_confirmation_code)
+from .filters import TitleFilter
+from .viewsets import BaseViewSet
 
 
 class SignUpViewSet(APIView):
+    """Регистрация нового пользователя"""
 
     permission_classes = [permissions.AllowAny]
 
     def post(self, request):
+        """Отправляет код подтверждения на email"""
         serializer = SignUpSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
+        email = serializer.validated_data.get('email')
+        username = serializer.validated_data.get('username')
         try:
-            user, _ = User.objects.get_or_create(
-                **serializer.validated_data
-            )
+            user, is_created = User.objects.get_or_create(
+                email=email,
+                username=username)
         except IntegrityError:
             return Response(
                 'Такой логин или email уже существуют',
                 status=status.HTTP_400_BAD_REQUEST
             )
         else:
-            confirmation_code = generate_confirmation_code(user)
+            confirmation_code = default_token_generator.make_token(user)
             send_confirmation_email(user, confirmation_code)
             return Response(
                 serializer.validated_data,
@@ -95,7 +96,7 @@ class UsersViewSet(viewsets.ModelViewSet):
     @action(
         detail=False,
         methods=['get', 'patch'],
-        permission_classes=[permissions.IsAuthenticated, IsOwnerOrAdmin]
+        permission_classes=[permissions.IsAuthenticated]
     )
     def me(self, request):
         if request.method == 'PATCH':
@@ -117,41 +118,29 @@ class UsersViewSet(viewsets.ModelViewSet):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-class CategoryViewSet(mixins.ListModelMixin,
-                      mixins.CreateModelMixin,
-                      mixins.DestroyModelMixin,
-                      viewsets.GenericViewSet):
+class CategoryViewSet(BaseViewSet):
     queryset = Categories.objects.all()
     serializer_class = CategoriesSerializer
-    permission_classes = [IsAdminOrReadOnly]
-    pagination_class = PageNumberPagination
-    filter_backends = [DjangoFilterBackend, SearchFilter]
-    search_fields = ['name']
-    lookup_field = 'slug'
 
 
-class GenreViewSet(mixins.ListModelMixin,
-                   mixins.CreateModelMixin,
-                   mixins.DestroyModelMixin,
-                   viewsets.GenericViewSet):
+class GenreViewSet(BaseViewSet):
     queryset = Genres.objects.all()
     serializer_class = GenresSerializer
-    permission_classes = [IsAdminOrReadOnly]
-    pagination_class = PageNumberPagination
-    filter_backends = [DjangoFilterBackend, SearchFilter]
-    search_fields = ['name']
-    lookup_field = 'slug'
 
 
 class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.annotate(
         rating=Avg('reviews__score')).order_by('id')
-    serializer_class = TitleSerializer
     http_method_names = ['get', 'post', 'patch', 'delete']
     permission_classes = [IsAdminOrReadOnly]
     filter_backends = [DjangoFilterBackend]
     filterset_class = TitleFilter
     pagination_class = PageNumberPagination
+
+    def get_serializer_class(self):
+        if self.action in ("list", "retrieve"):
+            return TitleReadSerializer
+        return TitleWriteSerializer
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
@@ -184,7 +173,10 @@ class CommentViewSet(viewsets.ModelViewSet):
 
     def get_review(self):
         return get_object_or_404(
-            Review, id=self.kwargs.get('review_id'))
+            Review,
+            id=self.kwargs.get('review_id'),
+            title__id=self.kwargs.get('title_id')
+        )
 
     def get_queryset(self):
         review = self.get_review()
