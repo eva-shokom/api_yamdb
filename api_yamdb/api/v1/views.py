@@ -6,9 +6,9 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.pagination import PageNumberPagination
+from rest_framework_simplejwt.tokens import AccessToken
 from django.db.models import Avg
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework.filters import SearchFilter
 from django.contrib.auth.tokens import default_token_generator
 
 from reviews.models import Categories, Genres, Title, Review
@@ -23,7 +23,7 @@ from .permissions import (
     IsAdmin,
     IsAdminOrReadOnly,
 )
-from .utils import (send_confirmation_email)
+from .utils import (send_confirmation_email, check_confirmation_code)
 from .filters import TitleFilter
 from .viewsets import BaseViewSet
 
@@ -69,6 +69,12 @@ class TokenViewSet(APIView):
             User,
             username=serializer.validated_data['username']
         )
+        if check_confirmation_code(user, confirmation_code):
+            token = AccessToken.for_user(user)
+            return Response(
+                {'token': str(token)},
+                status=status.HTTP_200_OK
+            )
         return Response(
             'Неверный код подтверждения',
             status=status.HTTP_400_BAD_REQUEST
