@@ -19,7 +19,7 @@ class UserSerializer(serializers.ModelSerializer):
         ]
 
 
-class SignUpSerializer(UserSerializer):
+class SignUpSerializer(serializers.Serializer):
     """Сериализатор для регистрации"""
 
     username = serializers.CharField(max_length=settings.USERNAME_MAX_LENGTH,
@@ -27,7 +27,7 @@ class SignUpSerializer(UserSerializer):
     email = serializers.EmailField(max_length=settings.EMAIL_MAX_LENGTH)
 
 
-class TokenSerializer(serializers.ModelSerializer):
+class TokenSerializer(serializers.Serializer):
     """Сериализатор для аутентификации по токену"""
 
     username = serializers.CharField(max_length=settings.USERNAME_MAX_LENGTH,
