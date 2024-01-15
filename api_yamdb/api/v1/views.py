@@ -99,22 +99,22 @@ class UsersViewSet(viewsets.ModelViewSet):
         permission_classes=[permissions.IsAuthenticated]
     )
     def me(self, request):
-        if request.method == 'PATCH':
-            serializer = SignUpSerializer(
-                request.user,
-                data=request.data,
-                partial=True
+        if request.method == "PATCH":
+            serializer = self.get_serializer(
+                request.user, data=request.data, partial=True
             )
-            serializer.is_valid(raise_exception=True)
-            if 'role' in serializer.validated_data:
-                serializer.validated_data.pop('role')
+            if not (serializer.is_valid()):
+                return Response(
+                    serializer.errors, status=status.HTTP_400_BAD_REQUEST
+                )
+            if serializer.validated_data.get("role"):
+                if request.user.role != "admin" or not (
+                    request.user.is_superuser
+                ):
+                    serializer.validated_data["role"] = request.user.role
             serializer.save()
-            return Response(
-                serializer.validated_data,
-                status=status.HTTP_200_OK
-            )
-
-        serializer = UserSerializer(request.user)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        serializer = self.get_serializer(request.user)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
