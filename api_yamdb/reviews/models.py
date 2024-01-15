@@ -1,11 +1,10 @@
-from datetime import datetime
-
-from django.contrib.auth import get_user_model
-from django.core.validators import MinValueValidator, MaxValueValidator
-from django.db import models
-from django.db.models import Q, F
-
 from django.conf import settings
+from django.contrib.auth import get_user_model
+from django.core.validators import MaxValueValidator, MinValueValidator
+from django.db import models
+from django.db.models import F, Q
+
+from .validators import validate_year
 
 
 User = get_user_model()
@@ -15,12 +14,13 @@ class Categories(models.Model):
     """Категории."""
 
     name = models.CharField(
-        max_length=256,
+        max_length=settings.MAX_LENGTH,
         verbose_name='Имя категории'
     )
     slug = models.SlugField(
         unique=True,
-        verbose_name='Слаг категории'
+        verbose_name='Слаг категории',
+        max_length=50,
     )
 
     class Meta:
@@ -62,16 +62,7 @@ class Title(models.Model):
     )
     year = models.SmallIntegerField(
         verbose_name='Год',
-        validators=[
-            MaxValueValidator(
-                0,
-                message='Год не может быть отрицательным!',
-            ),
-            MaxValueValidator(
-                datetime.now().year,
-                message='Год не может быть больше текущего!',
-            )
-        ],
+        validators=(validate_year,)
     )
     description = models.TextField(
         blank=True,

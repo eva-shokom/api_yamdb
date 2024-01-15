@@ -1,5 +1,5 @@
-from rest_framework import viewsets, mixins
 from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import mixins, viewsets
 from rest_framework.filters import SearchFilter
 from rest_framework.pagination import PageNumberPagination
 

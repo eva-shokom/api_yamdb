@@ -1,30 +1,25 @@
+from django.contrib.auth.tokens import default_token_generator
 from django.db import IntegrityError
+from django.db.models import Avg
 from django.shortcuts import get_object_or_404
-from rest_framework import (
-    viewsets, permissions, status, pagination, filters)
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import filters, pagination, permissions, status, viewsets
 from rest_framework.decorators import action
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.pagination import PageNumberPagination
 from rest_framework_simplejwt.tokens import AccessToken
-from django.db.models import Avg
-from django_filters.rest_framework import DjangoFilterBackend
-from django.contrib.auth.tokens import default_token_generator
-
-from reviews.models import Categories, Genres, Title, Review
+from reviews.models import Categories, Genres, Review, Title
 from users.models import User
-from .serializers import (
-    CategoriesSerializer, GenresSerializer, TitleReadSerializer,
-    ReviewSerializer, CommentSerializer, SignUpSerializer,
-    TokenSerializer, UserSerializer, TitleWriteSerializer
-)
-from .permissions import (
-    IsAuthorOrAdminOrModeratorOrReadOnly,
-    IsAdmin,
-    IsAdminOrReadOnly,
-)
-from .utils import (send_confirmation_email, check_confirmation_code)
+
 from .filters import TitleFilter
+from .permissions import (IsAdmin, IsAdminOrReadOnly,
+                          IsAuthorOrAdminOrModeratorOrReadOnly)
+from .serializers import (CategoriesSerializer, CommentSerializer,
+                          GenresSerializer, ReviewSerializer, SignUpSerializer,
+                          TitleReadSerializer, TitleWriteSerializer,
+                          TokenSerializer, UserSerializer)
+from .utils import check_confirmation_code, send_confirmation_email
 from .viewsets import BaseViewSet
 
 
