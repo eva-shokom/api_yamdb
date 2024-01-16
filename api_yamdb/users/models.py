@@ -32,7 +32,6 @@ class User(AbstractUser):
     )
 
     email = models.EmailField(
-        max_length=settings.EMAIL_MAX_LENGTH,
         verbose_name='E-mail',
         help_text='Укажите e-mail',
         unique=True,
@@ -53,7 +52,6 @@ class User(AbstractUser):
     )
 
     bio = models.TextField(
-        max_length=settings.BIO_MAX_LENGTH,
         verbose_name='О себе',
         help_text='Расскажите о себе',
         blank=True,
