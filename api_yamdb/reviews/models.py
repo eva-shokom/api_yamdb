@@ -4,7 +4,6 @@ from django.contrib.auth import get_user_model
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 from django.db.models import Q, F
-
 from django.conf import settings
 
 
@@ -15,7 +14,7 @@ class Categories(models.Model):
     """Категории."""
 
     name = models.CharField(
-        max_length=256,
+        max_length=settings.USERNAME_MAX_LENGTH,
         verbose_name='Имя категории'
     )
     slug = models.SlugField(
