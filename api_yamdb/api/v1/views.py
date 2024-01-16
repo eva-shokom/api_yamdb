@@ -7,16 +7,20 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.pagination import PageNumberPagination
 from rest_framework_simplejwt.tokens import AccessToken
+from rest_framework.serializers import ValidationError
 from django.db.models import Avg
 from django_filters.rest_framework import DjangoFilterBackend
 from django.contrib.auth.tokens import default_token_generator
+from django.core.mail import send_mail
+from django.conf import settings
 
 from reviews.models import Categories, Genres, Title, Review
 from users.models import User
 from .serializers import (
     CategoriesSerializer, GenresSerializer, TitleReadSerializer,
     ReviewSerializer, CommentSerializer, SignUpSerializer,
-    TokenSerializer, UserSerializer, TitleWriteSerializer
+    TokenSerializer, UserSerializer, TitleWriteSerializer,
+    UserSerializerOrReadOnly
 )
 from .permissions import (
     IsAuthorOrAdminOrModeratorOrReadOnly,
@@ -40,21 +44,18 @@ class SignUpViewSet(APIView):
         email = serializer.validated_data.get('email')
         username = serializer.validated_data.get('username')
         try:
-            user, is_created = User.objects.get_or_create(
-                email=email,
-                username=username)
+            user, is_created = User.objects.get_or_create(**serializer.validated_data)
         except IntegrityError:
-            return Response(
-                'Такой логин или email уже существуют',
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        else:
-            confirmation_code = default_token_generator.make_token(user)
-            send_confirmation_email(user, confirmation_code)
-            return Response(
-                serializer.validated_data,
-                status=status.HTTP_200_OK
-            )
+            raise ValidationError(detail='Username или Email уже занят.')
+        confirmation_code = default_token_generator.make_token(user)
+        send_mail(
+            subject='Ваш код подтверждения: ',
+            message=f'Код подтверждения - "{confirmation_code}".',
+            from_email=settings.ADMIN_EMAIL,
+            recipient_list=(email,))
+        return Response(
+            {'email': email, 'username': username},
+            status=status.HTTP_200_OK)
 
 
 class TokenViewSet(APIView):
@@ -99,23 +100,22 @@ class UsersViewSet(viewsets.ModelViewSet):
         permission_classes=[permissions.IsAuthenticated]
     )
     def me(self, request):
-        if request.method == "PATCH":
-            serializer = self.get_serializer(
-                request.user, data=request.data, partial=True
+        user = request.user
+        if request.method == 'GET':
+            serializer = UserSerializer(user)
+            return Response(
+                serializer.data,
+                status=status.HTTP_200_OK
             )
-            if not (serializer.is_valid()):
-                return Response(
-                    serializer.errors, status=status.HTTP_400_BAD_REQUEST
-                )
-            if serializer.validated_data.get("role"):
-                if request.user.role != "admin" or not (
-                    request.user.is_superuser
-                ):
-                    serializer.validated_data["role"] = request.user.role
+        if request.method == "PATCH":
+            serializer = UserSerializerOrReadOnly(
+                user,
+                data=request.data,
+                partial=True
+            )
+            serializer.is_valid(raise_exception=True)
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
-        serializer = self.get_serializer(request.user)
-        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class CategoryViewSet(BaseViewSet):
