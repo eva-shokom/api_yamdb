@@ -1,12 +1,8 @@
+from django.conf import settings
 from rest_framework import serializers
 from rest_framework.validators import ValidationError
-from django.conf import settings
-from django.core.validators import MinValueValidator, MaxValueValidator
-
-from reviews.models import Categories, Genres, Title, Review, Comment
+from reviews.models import Categories, Comment, Genres, Review, Title
 from users.models import User
-
-from datetime import datetime
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -95,12 +91,7 @@ class TitleReadSerializer(serializers.ModelSerializer):
 
 
 class TitleWriteSerializer(serializers.ModelSerializer):
-    year = serializers.IntegerField(
-        validators=[
-            MinValueValidator(0),
-            MaxValueValidator(datetime.now().year),
-        ],
-    )
+    year = serializers.IntegerField()
     genre = serializers.SlugRelatedField(
         slug_field="slug", many=True, queryset=Genres.objects.all()
     )
