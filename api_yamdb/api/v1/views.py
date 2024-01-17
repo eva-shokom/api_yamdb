@@ -1,16 +1,11 @@
-from django.contrib.auth.tokens import default_token_generator
 from django.db import IntegrityError
-from django.db.models import Avg
 from django.shortcuts import get_object_or_404
 
 from django.conf import settings
 from django.core.mail import send_mail
 from django.db.models import Avg
-from django_filters.rest_framework import DjangoFilterBackend
 from django.contrib.auth.tokens import default_token_generator
 
-from rest_framework import (
-    viewsets, permissions, status, pagination, filters)
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, pagination, permissions, status, viewsets
 from rest_framework.decorators import action
@@ -28,19 +23,9 @@ from .serializers import (
     TokenSerializer, UserSerializer, TitleWriteSerializer,
     UserSerializerOrReadOnly
 )
-from .permissions import (
-    IsAuthorOrAdminOrModeratorOrReadOnly,
-    IsAdmin,
-    IsAdminOrReadOnly,
-)
 from .filters import TitleFilter
 from .permissions import (IsAdmin, IsAdminOrReadOnly,
                           IsAuthorOrAdminOrModeratorOrReadOnly)
-from .serializers import (CategoriesSerializer, CommentSerializer,
-                          GenresSerializer, ReviewSerializer, SignUpSerializer,
-                          TitleReadSerializer, TitleWriteSerializer,
-                          TokenSerializer, UserSerializer)
-from .utils import check_confirmation_code, send_confirmation_email
 from .viewsets import BaseViewSet
 
 
