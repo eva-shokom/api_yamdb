@@ -1,6 +1,7 @@
 from django.conf import settings
 from rest_framework import serializers
 from rest_framework.validators import ValidationError
+
 from reviews.models import Categories, Comment, Genres, Review, Title
 from users.models import User
 
@@ -13,6 +14,23 @@ class UserSerializer(serializers.ModelSerializer):
         fields = [
             'username', 'email', 'first_name', 'last_name', 'bio', 'role'
         ]
+
+
+class UserSerializerOrReadOnly(serializers.ModelSerializer):
+    """Сериалайзер пользователей(чтение)"""
+
+    role = serializers.CharField(read_only=True)
+
+    class Meta:
+        fields = (
+            'first_name',
+            'last_name',
+            'username',
+            'bio',
+            'email',
+            'role'
+        )
+        model = User
 
 
 class SignUpSerializer(serializers.Serializer):

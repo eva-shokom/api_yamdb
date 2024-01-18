@@ -2,8 +2,8 @@ from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 
 from api.v1.views import (
-    CategoryViewSet, CommentViewSet, GenreViewSet, TitleViewSet,
-    ReviewViewSet, UsersViewSet, SignUpViewSet, TokenViewSet
+    CategoryViewSet, CommentViewSet, GenreViewSet, ReviewViewSet,
+    SignUpViewSet, TitleViewSet, TokenViewSet, UsersViewSet
 )
 
 
