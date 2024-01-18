@@ -16,7 +16,7 @@ class Categories(models.Model):
     """Категории."""
 
     name = models.CharField(
-        max_length=256,
+        max_length=settings.MAX_LENGTH,
         verbose_name='Имя категории'
     )
     slug = models.SlugField(

@@ -8,12 +8,12 @@ from django.shortcuts import get_object_or_404
 from rest_framework import filters, pagination, permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
+from rest_framework.serializers import ValidationError
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import AccessToken
 from reviews.models import Categories, Genres, Review, Title
 from users.models import User
-from rest_framework.serializers import ValidationError
 
 from .filters import TitleFilter
 from .permissions import (
@@ -40,7 +40,9 @@ class SignUpViewSet(APIView):
         email = serializer.validated_data.get('email')
         username = serializer.validated_data.get('username')
         try:
-            user, is_created = User.objects.get_or_create(**serializer.validated_data)
+            user, is_created = User.objects.get_or_create(
+                **serializer.validated_data
+            )
         except IntegrityError:
             raise ValidationError(detail='Username или Email уже занят.')
         confirmation_code = default_token_generator.make_token(user)
