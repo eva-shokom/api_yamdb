@@ -1,6 +1,8 @@
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.core.validators import MaxValueValidator, MinValueValidator
+from django.core.validators import (
+    MaxValueValidator, MinValueValidator, RegexValidator,
+)
 from django.db import models
 from django.db.models import F, Q
 
@@ -20,7 +22,9 @@ class Categories(models.Model):
     slug = models.SlugField(
         unique=True,
         verbose_name='Слаг категории',
-        max_length=50,
+        max_length=settings.SLUG_MAX_LENGTH,
+        validators=[RegexValidator(regex=r'^[-a-zA-Z0-9_]+$',
+                    message='Некорректный slug.')]
     )
 
     class Meta:
@@ -42,6 +46,9 @@ class Genres(models.Model):
     slug = models.SlugField(
         verbose_name='Слаг',
         unique=True,
+        max_length=settings.SLUG_MAX_LENGTH,
+        validators=[RegexValidator(regex=r'^[-a-zA-Z0-9_]+$',
+                    message='Некорректный slug.')]
     )
 
     class Meta:

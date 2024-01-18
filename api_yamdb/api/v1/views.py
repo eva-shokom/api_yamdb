@@ -9,8 +9,8 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import AccessToken
-from reviews.models import Categories, Genres, Review, Title
 
+from reviews.models import Categories, Genres, Review, Title
 from users.models import User
 from .filters import TitleFilter
 from .permissions import (IsAdmin, IsAdminOrReadOnly,
@@ -24,12 +24,10 @@ from .viewsets import BaseViewSet
 
 
 class SignUpViewSet(APIView):
-    """Регистрация нового пользователя"""
 
     permission_classes = [permissions.AllowAny]
 
     def post(self, request):
-        """Отправляет код подтверждения на email"""
         serializer = SignUpSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         email = serializer.validated_data.get('email')
@@ -143,6 +141,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
     permission_classes = (
         permissions.IsAuthenticatedOrReadOnly,
         IsAuthorOrAdminOrModeratorOrReadOnly,
+        # IsSuperUserIsAdminIsModeratorIsAuthor
     )
     http_method_names = ['get', 'post', 'patch', 'delete']
 
