@@ -141,7 +141,6 @@ class ReviewViewSet(viewsets.ModelViewSet):
     permission_classes = (
         permissions.IsAuthenticatedOrReadOnly,
         IsAuthorOrAdminOrModeratorOrReadOnly,
-        # IsSuperUserIsAdminIsModeratorIsAuthor
     )
     http_method_names = ['get', 'post', 'patch', 'delete']
 

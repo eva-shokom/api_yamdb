@@ -1,4 +1,3 @@
-# from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator
 from django.utils import timezone
 
