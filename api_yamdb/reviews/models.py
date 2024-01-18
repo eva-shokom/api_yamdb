@@ -1,11 +1,10 @@
 from datetime import datetime
 
-from django.contrib.auth import get_user_model
-from django.core.validators import MinValueValidator, MaxValueValidator
-from django.db import models
-from django.db.models import Q, F
-
 from django.conf import settings
+from django.contrib.auth import get_user_model
+from django.core.validators import MaxValueValidator, MinValueValidator
+from django.db import models
+from django.db.models import F, Q
 
 
 User = get_user_model()
@@ -29,7 +28,7 @@ class Categories(models.Model):
         ordering = ('name',)
 
     def __str__(self):
-        return self.slug
+        return self.slug[:settings.STRING_MAX_LENGTH]
 
 
 class Genres(models.Model):
@@ -50,7 +49,7 @@ class Genres(models.Model):
         ordering = ('name',)
 
     def __str__(self):
-        return self.name
+        return self.name[:settings.STRING_MAX_LENGTH]
 
 
 class Title(models.Model):
@@ -97,7 +96,7 @@ class Title(models.Model):
         ordering = ('name',)
 
     def __str__(self):
-        return self.name
+        return self.name[:settings.STRING_MAX_LENGTH]
 
 
 class TitleGenres(models.Model):
@@ -119,7 +118,7 @@ class TitleGenres(models.Model):
         ordering = ('genre',)
 
     def __str__(self):
-        return f'{self.title}-{self.genre}'
+        return f'{self.title}-{self.genre}'[:settings.STRING_MAX_LENGTH]
 
 
 class Review(models.Model):
@@ -162,7 +161,7 @@ class Review(models.Model):
         ]
 
     def __str__(self):
-        return self.text[:20]
+        return self.text[:settings.STRING_MAX_LENGTH]
 
 
 class Comment(models.Model):
@@ -187,4 +186,4 @@ class Comment(models.Model):
         ordering = ('-pub_date',)
 
     def __str__(self):
-        return self.text[:20]
+        return self.text[:settings.STRING_MAX_LENGTH]
