@@ -39,6 +39,28 @@ class SignUpSerializer(serializers.Serializer):
     username = serializers.CharField(max_length=settings.USERNAME_MAX_LENGTH,
                                      validators=User.user_validators)
     email = serializers.EmailField(max_length=settings.EMAIL_MAX_LENGTH)
+    def validate(self, data):
+        """Валидация данных при регистрации пользователя"""
+        if User.objects.filter(username=data['username'],
+                               email=data['email']).exists():
+            return data
+        if User.objects.filter(username=data['username']).exists():
+            raise serializers.ValidationError(
+                {
+                    "username": [
+                        "Пользователь с таким username уже существует."
+                    ]
+                }
+            )
+        if User.objects.filter(email=data['email']).exists():
+            raise serializers.ValidationError(
+                {
+                    "email": [
+                        "Пользователь с таким email уже существует."
+                    ]
+                }
+            )
+        return data
 
 
 class TokenSerializer(serializers.Serializer):
