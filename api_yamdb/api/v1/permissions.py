@@ -9,6 +9,7 @@ class IsAdmin(BasePermission):
             and (request.user.is_admin or request.user.is_superuser)
         )
 
+
 class IsAuthorOrAdminOrModeratorOrReadOnly(BasePermission):
 
     def has_permission(self, request, view):

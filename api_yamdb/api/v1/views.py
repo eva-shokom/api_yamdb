@@ -1,4 +1,3 @@
-from django.db import IntegrityError
 from django.conf import settings
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
@@ -8,7 +7,6 @@ from django.shortcuts import get_object_or_404
 from rest_framework import filters, pagination, permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
-from rest_framework.serializers import ValidationError
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import AccessToken
@@ -32,29 +30,9 @@ class SignUpViewSet(APIView):
 
     permission_classes = [permissions.AllowAny]
 
-    # def post(self, request):
-    #     serializer = SignUpSerializer(data=request.data)
-    #     serializer.is_valid(raise_exception=True)
-    #     email = serializer.validated_data.get('email')
-    #     username = serializer.validated_data.get('username')
-    #     try:
-    #         user, is_created = User.objects.get_or_create(
-    #             **serializer.validated_data
-    #         )
-    #     except IntegrityError:
-    #         raise ValidationError(detail='Username или Email уже занят.')
-    #     confirmation_code = default_token_generator.make_token(user)
-    #     send_mail(
-    #         subject='Ваш код подтверждения: ',
-    #         message=f'Код подтверждения - "{confirmation_code}".',
-    #         from_email=settings.ADMIN_EMAIL,
-    #         recipient_list=(email,))
-    #     return Response(
-    #         {'email': email, 'username': username},
-    #         status=status.HTTP_200_OK)
-
     def post(self, request):
-        """Отправляет код подтверждения на email"""
+        """Отправляет код подтверждения на email."""
+
         serializer = SignUpSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         email = serializer.validated_data.get('email')
@@ -185,7 +163,7 @@ class TitleViewSet(viewsets.ModelViewSet):
     pagination_class = PageNumberPagination
 
     def get_serializer_class(self):
-        if self.action in ("list", "retrieve"):
+        if self.action in ('list', 'retrieve'):
             return TitleReadSerializer
         return TitleWriteSerializer
 

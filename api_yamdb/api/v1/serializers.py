@@ -1,4 +1,7 @@
+from datetime import datetime
+
 from django.conf import settings
+from django.core.validators import MaxValueValidator
 from rest_framework import serializers
 from rest_framework.validators import ValidationError
 
@@ -11,68 +14,45 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = [
-            'username', 'email', 'first_name', 'last_name', 'bio', 'role'
-        ]
+        fields = (
+            'username', 'email', 'first_name', 'last_name', 'bio', 'role',
+        )
 
 
 class UserSerializerOrReadOnly(serializers.ModelSerializer):
-    """Сериалайзер пользователей(чтение)"""
+    """Сериализатор для пользователей на чтение."""
 
     role = serializers.CharField(read_only=True)
 
     class Meta:
         fields = (
-            'first_name',
-            'last_name',
-            'username',
-            'bio',
-            'email',
-            'role'
+            'first_name', 'last_name', 'username', 'bio', 'email', 'role',
         )
         model = User
 
 
 class SignUpSerializer(serializers.Serializer):
-    """Сериализатор для регистрации"""
+    """Сериализатор для регистрации."""
 
-    username = serializers.CharField(max_length=settings.USERNAME_MAX_LENGTH,
-                                     validators=User.user_validators)
+    username = serializers.CharField(
+        max_length=settings.USERNAME_MAX_LENGTH,
+        validators=User.user_validators
+    )
     email = serializers.EmailField(max_length=settings.EMAIL_MAX_LENGTH)
-    def validate(self, data):
-        """Валидация данных при регистрации пользователя"""
-        if User.objects.filter(username=data['username'],
-                               email=data['email']).exists():
-            return data
-        if User.objects.filter(username=data['username']).exists():
-            raise serializers.ValidationError(
-                {
-                    "username": [
-                        "Пользователь с таким username уже существует."
-                    ]
-                }
-            )
-        if User.objects.filter(email=data['email']).exists():
-            raise serializers.ValidationError(
-                {
-                    "email": [
-                        "Пользователь с таким email уже существует."
-                    ]
-                }
-            )
-        return data
 
 
 class TokenSerializer(serializers.Serializer):
-    """Сериализатор для аутентификации по токену"""
+    """Сериализатор для аутентификации по токену."""
 
-    username = serializers.CharField(max_length=settings.USERNAME_MAX_LENGTH,
-                                     validators=User.user_validators)
+    username = serializers.CharField(
+        max_length=settings.USERNAME_MAX_LENGTH,
+        validators=User.user_validators
+    )
     confirmation_code = serializers.CharField(required=True)
 
     class Meta:
         model = User
-        fields = ['username', 'confirmation_code']
+        fields = ('username', 'confirmation_code')
 
 
 class CategoriesSerializer(serializers.ModelSerializer):
@@ -96,25 +76,31 @@ class GenresSerializer(serializers.ModelSerializer):
 
 
 class TitleReadSerializer(serializers.ModelSerializer):
+    """Сериализатор для произведения на чтение."""
+
     rating = serializers.IntegerField(read_only=True, default=None)
     genre = GenresSerializer(many=True, read_only=True)
     category = CategoriesSerializer(read_only=True)
 
     class Meta:
         fields = (
-            "id",
-            "name",
-            "year",
-            "rating",
-            "description",
-            "genre",
-            "category",
+            'id', 'name', 'year', 'rating', 'description', 'genre', 'category',
         )
         model = Title
 
 
 class TitleWriteSerializer(serializers.ModelSerializer):
-    year = serializers.IntegerField()
+    """Сериализатор для произведения на запись."""
+
+    year = serializers.IntegerField(
+        validators=[
+            MaxValueValidator(
+                datetime.now().year,
+                message='Год не может быть больше текущего!'
+            )
+        ],
+
+    )
     genre = serializers.SlugRelatedField(
         slug_field="slug", many=True, queryset=Genres.objects.all()
     )
@@ -123,7 +109,7 @@ class TitleWriteSerializer(serializers.ModelSerializer):
     )
 
     class Meta:
-        fields = ("id", "name", "year", "description", "genre", "category")
+        fields = ('id', 'name', 'year', 'description', 'genre', 'category')
         model = Title
 
     def to_representation(self, value):
@@ -132,6 +118,7 @@ class TitleWriteSerializer(serializers.ModelSerializer):
 
 class ReviewSerializer(serializers.ModelSerializer):
     """Сериализатор для отзывов."""
+
     author = serializers.SlugRelatedField(
         read_only=True, slug_field='username'
     )
@@ -154,6 +141,7 @@ class ReviewSerializer(serializers.ModelSerializer):
 
 class CommentSerializer(serializers.ModelSerializer):
     """Сериализатор для комментариев."""
+
     author = serializers.SlugRelatedField(
         read_only=True, slug_field='username'
     )
