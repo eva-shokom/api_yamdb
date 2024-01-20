@@ -1,60 +1,86 @@
-from django.db import IntegrityError
-from django.shortcuts import get_object_or_404
-from rest_framework import (
-    viewsets, permissions, status, pagination, filters)
-from rest_framework.decorators import action
-from rest_framework.response import Response
-from rest_framework.views import APIView
-from rest_framework.pagination import PageNumberPagination
-from rest_framework_simplejwt.tokens import AccessToken
+from django.conf import settings
+from django.contrib.auth.tokens import default_token_generator
+from django.core.mail import send_mail
 from django.db.models import Avg
 from django_filters.rest_framework import DjangoFilterBackend
-from django.contrib.auth.tokens import default_token_generator
+from django.shortcuts import get_object_or_404
+from rest_framework import filters, pagination, permissions, status, viewsets
+from rest_framework.decorators import action
+from rest_framework.pagination import PageNumberPagination
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework_simplejwt.tokens import AccessToken
 
-from reviews.models import Categories, Genres, Title, Review
-from users.models import User
-from .serializers import (
-    CategoriesSerializer, GenresSerializer, TitleReadSerializer,
-    ReviewSerializer, CommentSerializer, SignUpSerializer,
-    TokenSerializer, UserSerializer, TitleWriteSerializer
-)
-from .permissions import (
-    IsAuthorOrAdminOrModeratorOrReadOnly,
-    IsAdmin,
-    IsAdminOrReadOnly,
-)
-from .utils import (send_confirmation_email, check_confirmation_code)
 from .filters import TitleFilter
+from .permissions import (
+    IsAdmin, IsAuthorOrAdminOrModeratorOrReadOnly, IsAdminOrReadOnly
+)
+from .serializers import (
+    CategoriesSerializer, CommentSerializer, GenresSerializer,
+    ReviewSerializer, SignUpSerializer, TitleReadSerializer,
+    TitleWriteSerializer, TokenSerializer, UserSerializer,
+    UserSerializerOrReadOnly
+)
 from .viewsets import BaseViewSet
+from reviews.models import Categories, Genres, Review, Title
+from users.models import User
 
 
 class SignUpViewSet(APIView):
-    """Регистрация нового пользователя"""
 
     permission_classes = [permissions.AllowAny]
 
     def post(self, request):
-        """Отправляет код подтверждения на email"""
+        """Отправляет код подтверждения на email."""
+
         serializer = SignUpSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         email = serializer.validated_data.get('email')
         username = serializer.validated_data.get('username')
-        try:
-            user, is_created = User.objects.get_or_create(
-                email=email,
-                username=username)
-        except IntegrityError:
+        user_by_email = User.objects.filter(email=email).first()
+        user_by_username = User.objects.filter(username=username).first()
+        if (
+            user_by_email and user_by_username
+            and user_by_email != user_by_username
+        ):
             return Response(
-                'Такой логин или email уже существуют',
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        else:
-            confirmation_code = default_token_generator.make_token(user)
-            send_confirmation_email(user, confirmation_code)
+                {
+                    "username": [
+                        "Пользователь с таким username уже существует."
+                    ],
+                    "email": [
+                        "Пользователь с таким email уже существует."
+                    ]
+                },
+                status=status.HTTP_400_BAD_REQUEST)
+        if user_by_email and not user_by_username:
             return Response(
-                serializer.validated_data,
-                status=status.HTTP_200_OK
-            )
+                {
+                    "email": [
+                        "Пользователь с таким email уже существует."
+                    ]
+                },
+                status=status.HTTP_400_BAD_REQUEST)
+        if user_by_username and not user_by_email:
+            return Response(
+                {
+                    "username": [
+                        "Пользователь с таким username уже существует."
+                    ]
+                },
+                status=status.HTTP_400_BAD_REQUEST)
+        user, is_created = User.objects.get_or_create(
+            email=email, username=username)
+        confirmation_code = default_token_generator.make_token(user)
+        send_mail(
+            subject='Ваш код подтверждения:',
+            message=f'Код подтверждения - "{confirmation_code}".',
+            from_email=settings.ADMIN_EMAIL,
+            recipient_list=[email]
+        )
+        return Response(
+            {'email': email, 'username': username},
+            status=status.HTTP_200_OK)
 
 
 class TokenViewSet(APIView):
@@ -69,7 +95,7 @@ class TokenViewSet(APIView):
             User,
             username=serializer.validated_data['username']
         )
-        if check_confirmation_code(user, confirmation_code):
+        if default_token_generator.check_token(user, confirmation_code):
             token = AccessToken.for_user(user)
             return Response(
                 {'token': str(token)},
@@ -99,23 +125,22 @@ class UsersViewSet(viewsets.ModelViewSet):
         permission_classes=[permissions.IsAuthenticated]
     )
     def me(self, request):
-        if request.method == 'PATCH':
-            serializer = SignUpSerializer(
-                request.user,
+        user = request.user
+        if request.method == 'GET':
+            serializer = UserSerializer(user)
+            return Response(
+                serializer.data,
+                status=status.HTTP_200_OK
+            )
+        if request.method == "PATCH":
+            serializer = UserSerializerOrReadOnly(
+                user,
                 data=request.data,
                 partial=True
             )
             serializer.is_valid(raise_exception=True)
-            if 'role' in serializer.validated_data:
-                serializer.validated_data.pop('role')
             serializer.save()
-            return Response(
-                serializer.validated_data,
-                status=status.HTTP_200_OK
-            )
-
-        serializer = UserSerializer(request.user)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+            return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class CategoryViewSet(BaseViewSet):
@@ -138,7 +163,7 @@ class TitleViewSet(viewsets.ModelViewSet):
     pagination_class = PageNumberPagination
 
     def get_serializer_class(self):
-        if self.action in ("list", "retrieve"):
+        if self.action in ('list', 'retrieve'):
             return TitleReadSerializer
         return TitleWriteSerializer
 
