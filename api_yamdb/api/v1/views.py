@@ -12,8 +12,6 @@ from rest_framework.serializers import ValidationError
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import AccessToken
-from reviews.models import Categories, Genres, Review, Title
-from users.models import User
 
 from .filters import TitleFilter
 from .permissions import (
