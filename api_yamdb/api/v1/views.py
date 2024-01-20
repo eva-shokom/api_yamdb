@@ -34,23 +34,74 @@ class SignUpViewSet(APIView):
 
     permission_classes = [permissions.AllowAny]
 
+    # def post(self, request):
+    #     serializer = SignUpSerializer(data=request.data)
+    #     serializer.is_valid(raise_exception=True)
+    #     email = serializer.validated_data.get('email')
+    #     username = serializer.validated_data.get('username')
+    #     try:
+    #         user, is_created = User.objects.get_or_create(
+    #             **serializer.validated_data
+    #         )
+    #     except IntegrityError:
+    #         raise ValidationError(detail='Username или Email уже занят.')
+    #     confirmation_code = default_token_generator.make_token(user)
+    #     send_mail(
+    #         subject='Ваш код подтверждения: ',
+    #         message=f'Код подтверждения - "{confirmation_code}".',
+    #         from_email=settings.ADMIN_EMAIL,
+    #         recipient_list=(email,))
+    #     return Response(
+    #         {'email': email, 'username': username},
+    #         status=status.HTTP_200_OK)
+
     def post(self, request):
+        """Отправляет код подтверждения на email"""
         serializer = SignUpSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         email = serializer.validated_data.get('email')
         username = serializer.validated_data.get('username')
-        try:
-            user, is_created = User.objects.get_or_create(
-                **serializer.validated_data
-            )
-        except IntegrityError:
-            raise ValidationError(detail='Username или Email уже занят.')
+        user_by_email = User.objects.filter(email=email).first()
+        user_by_username = User.objects.filter(username=username).first()
+        if (
+            user_by_email and user_by_username
+            and user_by_email != user_by_username
+        ):
+            return Response(
+                {
+                    "username": [
+                        "Пользователь с таким username уже существует."
+                    ],
+                    "email": [
+                        "Пользователь с таким email уже существует."
+                    ]
+                },
+                status=status.HTTP_400_BAD_REQUEST)
+        if user_by_email and not user_by_username:
+            return Response(
+                {
+                    "email": [
+                        "Пользователь с таким email уже существует."
+                    ]
+                },
+                status=status.HTTP_400_BAD_REQUEST)
+        if user_by_username and not user_by_email:
+            return Response(
+                {
+                    "username": [
+                        "Пользователь с таким username уже существует."
+                    ]
+                },
+                status=status.HTTP_400_BAD_REQUEST)
+        user, is_created = User.objects.get_or_create(
+            email=email, username=username)
         confirmation_code = default_token_generator.make_token(user)
         send_mail(
-            subject='Ваш код подтверждения: ',
+            subject='Ваш код подтверждения:',
             message=f'Код подтверждения - "{confirmation_code}".',
             from_email=settings.ADMIN_EMAIL,
-            recipient_list=(email,))
+            recipient_list=[email]
+        )
         return Response(
             {'email': email, 'username': username},
             status=status.HTTP_200_OK)
