@@ -92,15 +92,6 @@ class TitleReadSerializer(serializers.ModelSerializer):
 class TitleWriteSerializer(serializers.ModelSerializer):
     """Сериализатор для произведения на запись."""
 
-    year = serializers.IntegerField(
-        validators=[
-            MaxValueValidator(
-                datetime.now().year,
-                message='Год не может быть больше текущего!'
-            )
-        ],
-
-    )
     genre = serializers.SlugRelatedField(
         slug_field="slug", many=True, queryset=Genres.objects.all()
     )
