@@ -22,9 +22,6 @@ class Categories(models.Model):
     slug = models.SlugField(
         unique=True,
         verbose_name='Слаг категории',
-        max_length=settings.SLUG_MAX_LENGTH,
-        validators=[RegexValidator(regex=r'^[-a-zA-Z0-9_]+$',
-                    message='Некорректный slug.')]
     )
 
     class Meta:
@@ -46,9 +43,6 @@ class Genres(models.Model):
     slug = models.SlugField(
         verbose_name='Слаг',
         unique=True,
-        max_length=settings.SLUG_MAX_LENGTH,
-        validators=[RegexValidator(regex=r'^[-a-zA-Z0-9_]+$',
-                    message='Некорректный slug.')]
     )
 
     class Meta:
