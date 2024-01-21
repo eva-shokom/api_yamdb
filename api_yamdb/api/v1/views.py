@@ -132,15 +132,15 @@ class UsersViewSet(viewsets.ModelViewSet):
                 serializer.data,
                 status=status.HTTP_200_OK
             )
-        if request.method == "PATCH":
-            serializer = UserSerializerOrReadOnly(
-                user,
-                data=request.data,
-                partial=True
-            )
-            serializer.is_valid(raise_exception=True)
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        serializer = UserSerializerOrReadOnly(
+            user,
+            data=request.data,
+            partial=True
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class CategoryViewSet(BaseViewSet):

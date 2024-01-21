@@ -1,7 +1,4 @@
-from datetime import datetime
-
 from django.conf import settings
-from django.core.validators import MaxValueValidator
 from rest_framework import serializers
 from rest_framework.validators import ValidationError
 
@@ -92,15 +89,6 @@ class TitleReadSerializer(serializers.ModelSerializer):
 class TitleWriteSerializer(serializers.ModelSerializer):
     """Сериализатор для произведения на запись."""
 
-    year = serializers.IntegerField(
-        validators=[
-            MaxValueValidator(
-                datetime.now().year,
-                message='Год не может быть больше текущего!'
-            )
-        ],
-
-    )
     genre = serializers.SlugRelatedField(
         slug_field="slug", many=True, queryset=Genres.objects.all()
     )
