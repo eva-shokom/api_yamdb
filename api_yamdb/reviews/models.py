@@ -1,12 +1,10 @@
+from datetime import datetime
+
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.core.validators import (
-    MaxValueValidator, MinValueValidator, RegexValidator,
-)
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.db.models import F, Q
-
-from .validators import validate_year
 
 
 User = get_user_model()
@@ -62,10 +60,13 @@ class Title(models.Model):
         verbose_name='Название'
     )
     year = models.SmallIntegerField(
-        verbose_name='Год',
         validators=[
-            validate_year,
+            MaxValueValidator(
+                datetime.now().year,
+                message='Год не может быть больше текущего!'
+            )
         ],
+        verbose_name='Год',
     )
     description = models.TextField(
         blank=True,
