@@ -146,7 +146,6 @@ ADMIN_EMAIL = 'admin@practicum.yandex.ru'
 
 
 # Constants
-SLUG_MAX_LENGTH = 50
 
 OUTPUT_RESTRICTION = 50
 
