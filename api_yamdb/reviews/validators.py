@@ -3,5 +3,5 @@ from django.utils import timezone
 
 
 def validate_year(value):
-    if not (0 < value <= timezone.now().year):
-        raise ValidationError('Проверьте год произведения!')
+    if value > timezone.now().year:
+        raise ValidationError('Год не может быть больше текущего!')

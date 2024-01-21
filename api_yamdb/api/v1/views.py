@@ -132,7 +132,7 @@ class UsersViewSet(viewsets.ModelViewSet):
                 serializer.data,
                 status=status.HTTP_200_OK
             )
-        
+
         serializer = UserSerializerOrReadOnly(
             user,
             data=request.data,

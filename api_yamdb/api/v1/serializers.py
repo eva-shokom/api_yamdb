@@ -1,7 +1,4 @@
-from datetime import datetime
-
 from django.conf import settings
-from django.core.validators import MaxValueValidator
 from rest_framework import serializers
 from rest_framework.validators import ValidationError
 
