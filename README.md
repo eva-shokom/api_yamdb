@@ -51,7 +51,7 @@
 1. Склонировать репозиторий.
 
 ```bash
-git@github.com:eva-shokom/api_yamdb.git
+git clone git@github.com:eva-shokom/api_yamdb.git
 ```
 
 2. Находясь в корневой директории проекта, создать виртуальное окружение и активировать его
