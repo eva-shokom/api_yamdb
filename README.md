@@ -83,11 +83,10 @@ pip install -r requirements.txt
 cd api_yambd
 ```
 
-5. Выполнить миграции, заполнить базу данных из файлов csv, создать суперюзера
+5. Выполнить миграции и заполнить базу данных из файлов csv
 
 ```bash
 python manage.py migrate
-python manage.py createsuperuser
 python manage.py from_csv_to_db
 ```
 
