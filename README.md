@@ -77,7 +77,11 @@ python -m pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
-4. Заполнить базу данных из файлов csv: `python manage.py from_csv_to_db`
+4. Заполнить базу данных из файлов csv:
+
+```bash
+python manage.py from_csv_to_db
+```
 
 #### Для запуска сервера разработки необходимо выполнить следующие команды в директории проекта:
 
