@@ -8,6 +8,15 @@
 
 Пользователи могут оставлять текстовые отзывы и выставлять рейтинг произведению. Они также могут комментировать отзывы других пользователей и ставить им оценки.
 
+## Стек технологий
+
+![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54)
+![Django](https://img.shields.io/badge/django-%23092E20.svg?style=for-the-badge&logo=django&logoColor=white)
+![DjangoREST](https://img.shields.io/badge/DJANGO-REST-ff1709?style=for-the-badge&logo=django&logoColor=white&color=ff1709&labelColor=gray)
+![SQLite](https://img.shields.io/badge/sqlite-%2307405e.svg?style=for-the-badge&logo=sqlite&logoColor=white)
+![JWT](https://img.shields.io/badge/JWT-black?style=for-the-badge&logo=JSON%20web%20tokens)
+![Postman](https://img.shields.io/badge/Postman-FF6C37?style=for-the-badge&logo=postman&logoColor=white)
+
 ## Доступный функционал
 
 Для работы с проектом доступны следующие ресурсы API:
@@ -87,9 +96,9 @@ python manage.py runserver
 ---
 
 Проект подготовили:
-[eva-shokom](https://github.com/eva-shokom/) - тимлид, координировала действия команды, декомпозировала задачи, отвечала за часть, касающуюся отзывов, комментариев и рейтинга произведений.
-[richckov](https://github.com/richckov/) - писал код для категорий, жанров и произведений, выполнял импорт данных в базу данных из .csv файлов.
-[eXc1t3]((https://github.com/eXc1t3/) - реализовал авторизацию и аутентификацию пользователей, права пользователей.
+- [eva-shokom](https://github.com/eva-shokom/) - тимлид, координировала действия команды, декомпозировала задачи, отвечала за часть, касающуюся отзывов, комментариев и рейтинга произведений.
+- [richckov](https://github.com/richckov/) - писал код для категорий, жанров и произведений, выполнял импорт данных в базу данных из .csv файлов.
+- [eXc1t3]((https://github.com/eXc1t3/) - реализовал авторизацию и аутентификацию пользователей, права пользователей.
 
 Если у вас возникнут вопросы, пожелания и предложения, вы можете обращаться к авторам этого проекта. Будем рады видеть вашу обратную связь! 
 
