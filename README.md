@@ -77,17 +77,23 @@ python -m pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
-4. Заполнить базу данных из файлов csv:
+4. Перейти в папку api_yamdb
+  
+```bash
+cd api_yambd
+```
+
+5. Выполнить миграции, заполнить базу данных из файлов csv, создать суперюзера
 
 ```bash
+python manage.py migrate
+python manage.py createsuperuser
 python manage.py from_csv_to_db
 ```
 
-#### Для запуска сервера разработки необходимо выполнить следующие команды в директории проекта:
+6. Запустить сервер
 
-```
-python manage.py migrate
-python manage.py createsuperuser
+```bash
 python manage.py runserver
 ```
 
