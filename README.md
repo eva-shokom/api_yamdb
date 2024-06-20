@@ -62,7 +62,7 @@ python -m venv venv
 
 Для Windows:
 ```bash
-source venv\scripts\activate
+source venv/Scripts/activate
 ```
 
 Для Linux/Mac:
