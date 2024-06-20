@@ -73,7 +73,7 @@ source venv/bin/activate
 3. Обновить pip, установить необходимые зависимости
 
 ```bash
-pytnon -m pip install --upgrade pip
+python -m pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
